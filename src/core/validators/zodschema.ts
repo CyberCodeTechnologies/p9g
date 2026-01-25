@@ -211,7 +211,22 @@ export const searchValidator = z.object({
   searchReservationStatus: z.string().optional(),
   searchReservationType: z.string().optional(),
   searchUserName: z.string().optional(),
+  searchTitle: z.string().optional(),
+  searchDepartment: z.string().optional(),
+  searchStatus: z.string().optional(),
+  searchAssignToUserId: z.string().optional(),
   startDate: z.coerce.date().optional()
+});
+
+export const taskValidator = z.object({
+  id: z.string().length(36),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().nullish().optional(),
+  department: z.string().nullish().optional(),
+  notes: z.string().nullish().optional(),
+  status: z.string().min(1, 'Status is required'),
+  assignToUserId: z.string().optional(),
+  modelState: z.string().optional()
 });
 
 export const pookieActivateValidator = z.object({

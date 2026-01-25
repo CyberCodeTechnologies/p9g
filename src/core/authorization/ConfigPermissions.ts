@@ -9,6 +9,7 @@ export const ConfigPermissions = {
         '/console/roomchange', 
         '/console/roomschedule',
         '/console/customers',
+        '/console/tasks',
         '/console/reports',
         '/console/settings',
         '/console/pookie/draw',

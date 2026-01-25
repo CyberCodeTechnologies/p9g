@@ -440,6 +440,19 @@ export const roomReservationRelations = relations(roomReservationTable, ({ one, 
   })
 }));
 
+export const taskTable = mysqlTable("task", {
+  id: char("id", { length: 36 }).$defaultFn(uuidv4).primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  department: varchar("department", { length: 100 }),
+  notes: text("notes"),
+  status: varchar("status", { length: 50 }).notNull(), // Open, Done, Closed
+  assignToUserId: char("assignToUserId", { length: 36 }),
+  createdAtUTC: datetime("createdAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).notNull(),
+  createdBy: char("createdBy", { length: 36 }).notNull(),
+  updatedAtUTC: datetime("updatedAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).$onUpdateFn(() => new Date()).notNull(),
+  updatedBy: char("updatedBy", { length: 36 }).notNull()
+});
 
 // Export TypeScript types
 // export type BillEntity = typeof billTable.$inferSelect;

@@ -6,7 +6,9 @@ export const AppUrl = {
 export const ConfigGroup = {
     RESERVATION_STATUS: "RESERVATION_STATUS",
     RESERVATION_TYPE: "RESERVATION_TYPE",
-    RIDE_TYPE: "RIDE_TYPE"
+    RIDE_TYPE: "RIDE_TYPE",
+    TASK_STATUS: "TASK_STATUS",
+    DEPARTMENT: "DEPARTMENT"
 }
 
 export const CurrencyList = ['KWR', 'MMK', 'THB', 'USD'] as const;
@@ -109,6 +111,20 @@ export const SelectList = {
         ["NOT_REQUIRED", "Not Required"],
         ["SHARED", "Shared"],
         ["PRIVATE", "Private"]
+    ]),
+
+    TASK_STATUS: new Map<string, string>([
+        ["Open", "Open"],
+        ["Done", "Done"],
+        ["Closed", "Closed"]
+    ]),
+
+    DEPARTMENTS: new Map<string, string>([
+        ["Housekeeping", "Housekeeping"],
+        ["Front Office", "Front Office"],
+        ["Maintenance", "Maintenance"],
+        ["IT", "IT"],
+        ["Admin", "Admin"]
     ])
 } as const;
 
@@ -156,6 +172,15 @@ export const SelectListForm = {
     TRANSPORTATION: new Map<string, string>([
         ["DEFAULT", "Choose"], 
         ...SelectList.TRANSPORTATION.entries()
+    ]),
+
+    TASK_STATUS: new Map<string, string>([
+        ...SelectList.TASK_STATUS.entries()
+    ]),
+
+    DEPARTMENTS: new Map<string, string>([
+        ["DEFAULT", "Choose"],
+        ...SelectList.DEPARTMENTS.entries()
     ])
 } as const;
 
@@ -199,6 +224,16 @@ export const SelectListSearch = {
     TRANSPORTATION: new Map<string, string>([
         ["DEFAULT", "Show All"], 
         ...SelectList.TRANSPORTATION.entries()
+    ]),
+
+    TASK_STATUS: new Map<string, string>([
+        ["DEFAULT", "Show All"], 
+        ...SelectList.TASK_STATUS.entries()
+    ]),
+
+    DEPARTMENTS: new Map<string, string>([
+        ["DEFAULT", "Show All"],
+        ...SelectList.DEPARTMENTS.entries()
     ])
 } as const;
 

@@ -90,6 +90,18 @@ export function buildAnyCondition(queryObject: any): AnyCondition | null {
     if (queryStringObject.searchEmail) {
         conditions.push(eq('email', queryStringObject.searchEmail));
     }
+    if (queryStringObject.searchTitle) {
+        conditions.push(or(eq('title', queryStringObject.searchTitle), like('title', `%${queryStringObject.searchTitle}%`)));
+    }
+    if (queryStringObject.searchDepartment) {
+        conditions.push(eq('department', queryStringObject.searchDepartment));
+    }
+    if (queryStringObject.searchStatus) {
+        conditions.push(eq('status', queryStringObject.searchStatus));
+    }
+    if (queryStringObject.searchAssignToUserId) {
+        conditions.push(eq('assignToUserId', queryStringObject.searchAssignToUserId));
+    }
     if (conditions.length === 0) return null;
 
     return conditions.length > 1 ? and(...conditions) : conditions[0];

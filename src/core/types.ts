@@ -56,6 +56,10 @@ export type SearchFormFields = {
   searchReservationStatus?: string | undefined,
   searchReservationType?: string | undefined,
   searchUserName?: string | undefined,
+  searchTitle?: string | undefined,
+  searchDepartment?: string | undefined,
+  searchStatus?: string | undefined,
+  searchAssignToUserId?: string | undefined,
 };
 
 export const TYPES = {
@@ -97,5 +101,7 @@ export const TYPES = {
   IRoomTypeRepository: Symbol.for('IRoomTypeRepository'),
   IUserRepository: Symbol.for('IUserRepository'),
   IUserService: Symbol.for('IUserService'),
+  ITaskRepository: Symbol.for('ITaskRepository'),
+  ITaskService: Symbol.for('ITaskService'),
 }
 
