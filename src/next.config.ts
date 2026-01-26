@@ -82,18 +82,10 @@ const nextConfig: NextConfig = {
     webpackBuildWorker: true,
     optimizeServerReact: true,
     ppr: false, // Partial Prerendering
-    // Turbopack options (if using)
-    turbopack: {
-      resolveAlias: {
-        '~': './src',
-      },
-    },
-  },
+  }
+};
 
-  // === WEBPACK CONFIG ===
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
-    // Custom webpack configuration
-    config.resolve.alias = {
+export default nextConfig;
       ...config.resolve.alias,
       '@': './src',
       '~': './src',

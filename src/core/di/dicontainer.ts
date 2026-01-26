@@ -21,7 +21,7 @@ import IReportService from '@/core/services/contracts/IReportService';
 import ReportService from '@/core/services/ReportService';
 import ILogService from '@/core/services/contracts/ILogService';
 import LogService from '@/core/services/LogService';
-import { billTable, configTable, customerTable, feedbackTable, logErrorTable, mediaTable, paymentTable, pookieConfigTable, pookieDeviceTable, pookieTable, prepaidTable, promotionTable, reservationCustomerTable, reservationTable, roomChargeTable, roomRateTable, roomReservationTable, roomTable, roomTypeTable, taskTable, userTable } from '@/core/orms/drizzle/mysql/schema';
+import { billTable, configTable, customerTable, feedbackTable, logErrorTable, mediaTable, paymentTable, pookieConfigTable, pookieDeviceTable, pookieTable, prepaidTable, promotionTable, reservationCustomerTable, reservationTable, roomChargeTable, roomRateTable, roomReservationTable, roomTable, roomTypeTable, taskNoteTable, taskTable, userTable } from '@/core/orms/drizzle/mysql/schema';
 import { Repository } from '@/lib/repositories/drizzle/Repository';
 import IRepository from '@/lib/repositories/IRepository';
 import CustomMapper from '@/lib/mappers/custommapper/CustomMapper';
@@ -82,6 +82,10 @@ import ITaskService from '../services/contracts/ITaskService';
 import TaskService from '../services/TaskService';
 import Task from '@/core/models/domain/Task';
 import TaskEntity from '@/core/models/entity/TaskEntity';
+import ITaskNoteService from '../services/contracts/ITaskNoteService';
+import TaskNoteService from '../services/TaskNoteService';
+import TaskNote from '@/core/models/domain/TaskNote';
+import TaskNoteEntity from '@/core/models/entity/TaskNoteEntity';
 
 // create a DI container
 const container = new Container();
@@ -103,6 +107,7 @@ container.bind<IReportService>(TYPES.IReportService).to(ReportService).inRequest
 container.bind<IReservationService>(TYPES.IReservationService).to(ReservationService).inRequestScope();
 container.bind<IUserService>(TYPES.IUserService).to(UserService).inRequestScope();
 container.bind<ITaskService>(TYPES.ITaskService).to(TaskService).inRequestScope();
+container.bind<ITaskNoteService>(TYPES.ITaskNoteService).to(TaskNoteService).inRequestScope();
 
 // Bind Repositories
 container.bind<IRepository<Bill>>(TYPES.IBillRepository).toDynamicValue(context => {
@@ -434,6 +439,23 @@ container.bind<IRepository<Task>>(TYPES.ITaskRepository).toDynamicValue(context 
             context.get<IQueryTranformer>(TYPES.IQueryTransformer)
         ),
         "task",
+        context.get<ICacheAdapter>(TYPES.ICacheAdapter)
+    )
+}).inRequestScope();
+
+container.bind<IRepository<TaskNote>>(TYPES.ITaskNoteRepository).toDynamicValue(context => {
+    return new CacheRepositoryDecorator(
+        new Repository(
+            context.get<IDatabaseClient<any>>(TYPES.IDatabase),
+            taskNoteTable,
+            { ...taskNoteTable },
+            (q) => q,
+            context.get<IMapper>(TYPES.IMapper),
+            TaskNote,
+            TaskNoteEntity,
+            context.get<IQueryTranformer>(TYPES.IQueryTransformer)
+        ),
+        "taskNote",
         context.get<ICacheAdapter>(TYPES.ICacheAdapter)
     )
 }).inRequestScope();

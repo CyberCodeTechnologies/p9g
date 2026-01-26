@@ -7,4 +7,5 @@ export default class TaskEntity extends EntityBase {
   public notes: string | null = null;
   public status: string = "";
   public assignToUserId: string | null = null;
+  public dueDate: Date | null = null;
 }

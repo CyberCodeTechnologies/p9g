@@ -7,4 +7,5 @@ export default class Task extends DomainBase {
   public notes: string | null = null;
   public status: string = "";
   public assignToUserId: string | null = null;
+  public dueDate: Date | null = null;
 }

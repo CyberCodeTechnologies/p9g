@@ -46,15 +46,15 @@ export default function TaskEditForm({ onSaved, openCallback, userMap, departmen
 
     return (
         <Dialog open={open} onOpenChange={setOpen} >
-            <DialogContent className="h-auto w-auto">
+            <DialogContent className="w-[500px] h-auto max-h-[80vh]">
                 <DialogHeader>
                     <DialogTitle>Edit Task</DialogTitle>
                     <DialogDescription>
                     </DialogDescription>
                 </DialogHeader>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto pr-2">
                     <TaskDetailForm onDataChanged={handleDataChanged} resetDataToggle={resetDataToggle} task={task} userMap={userMap} departmentMap={departmentMap} />
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 sticky bottom-0 bg-background pt-2">
                         <ButtonCustom type="button" variant={"green"} onClick={async () => {
                             const result = await taskUpdate(task);
                             if(result.error){

@@ -10,6 +10,7 @@ import { ButtonCustom } from "../../../lib/components/web/react/uicustom/buttonc
 import Task from "@/core/models/domain/Task"
 import TaskEditForm from "../forms/taskeditform";
 import { CopyIcon } from "lucide-react";
+import TaskNotesDialog from "../dialogs/tasknotesdialog";
 
 
 interface DataTableProps {
@@ -29,6 +30,8 @@ export default function TaskTable({
 }: DataTableProps) {
 
   const openCallbackFunc = React.useRef<{ openDialog: (open: boolean) => void, setEditTask: (task: Task) => void } | undefined>(undefined);
+  const [notesOpen, setNotesOpen] = React.useState(false);
+  const [notesTaskId, setNotesTaskId] = React.useState<string | null>(null);
 
   const [clientState, setClientState] = React.useState(formState);
 
@@ -86,8 +89,28 @@ export default function TaskTable({
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
+        const status = row.getValue('status') as string;
+        const dueDate = row.original.dueDate;
+        const isOverdue = status !== 'Closed' && dueDate && new Date(dueDate) < new Date();
+        
+        let className = "font-bold ";
+        if (isOverdue) className += "text-red-600";
+        else if (status === 'Open') className += "text-green-600";
+        else if (status === 'Done') className += "text-blue-600";
+        else if (status === 'Closed') className += "text-black";
+
+        return <div className={className}>
+          {status} {isOverdue ? "(Overdue)" : ""}
+        </div>
+      }
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Due Date",
+      cell: ({ row }) => {
+        const date = row.getValue('dueDate');
         return <div>
-          {row.getValue('status')}
+          {date ? new Date(date as string).toLocaleDateString() : ''}
         </div>
       }
     },
@@ -106,7 +129,7 @@ export default function TaskTable({
         header: "Created At",
         cell: ({ row }) => {
           return <div>
-            {row.getValue('createdAtUTC') ? new Date(row.getValue('createdAtUTC')).toLocaleDateString() : ''}
+            {row.getValue('createdAtUTC') ? new Date(row.getValue('createdAtUTC')).toLocaleString() : ''}
           </div>
         }
     },
@@ -114,8 +137,9 @@ export default function TaskTable({
         accessorKey: "createdBy",
         header: "Created By",
         cell: ({ row }) => {
+            const userId = row.getValue('createdBy') as string;
             return <div>
-            {row.getValue('createdBy')}
+            {userMap.get(userId) ?? userId}
             </div>
         }
     },
@@ -124,7 +148,7 @@ export default function TaskTable({
         header: "Updated At",
         cell: ({ row }) => {
             return <div>
-            {row.getValue('updatedAtUTC') ? new Date(row.getValue('updatedAtUTC')).toLocaleDateString() : ''}
+            {row.getValue('updatedAtUTC') ? new Date(row.getValue('updatedAtUTC')).toLocaleString() : ''}
             </div>
         }
     },
@@ -132,8 +156,9 @@ export default function TaskTable({
         accessorKey: "updatedBy",
         header: "Updated By",
         cell: ({ row }) => {
+            const userId = row.getValue('updatedBy') as string;
             return <div>
-            {row.getValue('updatedBy')}
+            {userMap.get(userId) ?? userId}
             </div>
         }
     },
@@ -148,6 +173,10 @@ export default function TaskTable({
               openCallbackFunc.current?.setEditTask(task);
               openCallbackFunc.current?.openDialog(true);
             }}>Edit</ButtonCustom>
+            <ButtonCustom variant="outline" size="sm" type="button" onClick={() => {
+              setNotesTaskId(task.id);
+              setNotesOpen(true);
+            }}>Notes</ButtonCustom>
           </div>
         )
       }
@@ -162,6 +191,7 @@ export default function TaskTable({
     <div className="flex flex-col gap-4">
       <DataTable columns={columns} formState={clientState} formAction={formAction} formRef={formRef} />
       <TaskEditForm onSaved={handleSave} openCallback={(func) => openCallbackFunc.current = func} userMap={userMap} departmentMap={departmentMap} />
+      {notesTaskId && <TaskNotesDialog isOpen={notesOpen} taskId={notesTaskId} onOpenChanged={setNotesOpen} userMap={userMap} />}
     </div>
   );
 }

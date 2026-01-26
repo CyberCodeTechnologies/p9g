@@ -215,17 +215,27 @@ export const searchValidator = z.object({
   searchDepartment: z.string().optional(),
   searchStatus: z.string().optional(),
   searchAssignToUserId: z.string().optional(),
+  searchDueDate: z.coerce.string().optional(),
   startDate: z.coerce.date().optional()
 });
 
 export const taskValidator = z.object({
-  id: z.string().length(36),
+  id: z.string().length(36).optional(),
   title: z.string().min(1, 'Title is required'),
   description: z.string().nullish().optional(),
   department: z.string().nullish().optional(),
   notes: z.string().nullish().optional(),
   status: z.string().min(1, 'Status is required'),
-  assignToUserId: z.string().optional(),
+  assignToUserId: z.string().nullish().transform(x => x || undefined).optional(),
+  dueDate: z.coerce.date().nullish().catch(undefined).optional(),
+  modelState: z.string().optional()
+});
+
+export const taskNoteValidator = z.object({
+  id: z.string().length(36).optional(),
+  taskId: z.string().length(36),
+  content: z.string().min(1, 'Content is required'),
+  type: z.string().default('NOTE'),
   modelState: z.string().optional()
 });
 

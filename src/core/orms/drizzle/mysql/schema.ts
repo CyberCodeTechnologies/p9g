@@ -448,6 +448,18 @@ export const taskTable = mysqlTable("task", {
   notes: text("notes"),
   status: varchar("status", { length: 50 }).notNull(), // Open, Done, Closed
   assignToUserId: char("assignToUserId", { length: 36 }),
+  dueDate: datetime("dueDate", { mode: 'date', fsp: 3 }),
+  createdAtUTC: datetime("createdAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).notNull(),
+  createdBy: char("createdBy", { length: 36 }).notNull(),
+  updatedAtUTC: datetime("updatedAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).$onUpdateFn(() => new Date()).notNull(),
+  updatedBy: char("updatedBy", { length: 36 }).notNull()
+});
+
+export const taskNoteTable = mysqlTable("taskNote", {
+  id: char("id", { length: 36 }).$defaultFn(uuidv4).primaryKey(),
+  taskId: char("taskId", { length: 36 }).notNull().references(() => taskTable.id, { onDelete: 'cascade' }),
+  content: text("content").notNull(),
+  type: varchar("type", { length: 50 }).notNull().default("NOTE"), // NOTE, EMAIL, CHAT
   createdAtUTC: datetime("createdAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).notNull(),
   createdBy: char("createdBy", { length: 36 }).notNull(),
   updatedAtUTC: datetime("updatedAtUTC", { mode: 'date', fsp: 3 }).$defaultFn(() => new Date()).$onUpdateFn(() => new Date()).notNull(),

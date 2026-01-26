@@ -102,9 +102,15 @@ export function buildAnyCondition(queryObject: any): AnyCondition | null {
     if (queryStringObject.searchAssignToUserId) {
         conditions.push(eq('assignToUserId', queryStringObject.searchAssignToUserId));
     }
-    if (conditions.length === 0) return null;
+    if (queryStringObject.searchDueDate) {
+        conditions.push(and(
+            gte('dueDate', queryStringObject.searchDueDate),
+            lte('dueDate', getUTCDateMidNight(queryStringObject.searchDueDate as Date))
+        ));
+    }
 
-    return conditions.length > 1 ? and(...conditions) : conditions[0];
+    if (conditions.length === 0) return null;
+    return and(...conditions);
 }
 /**
  * Get local date string to display in client browser.

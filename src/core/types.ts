@@ -60,6 +60,7 @@ export type SearchFormFields = {
   searchDepartment?: string | undefined,
   searchStatus?: string | undefined,
   searchAssignToUserId?: string | undefined,
+  searchDueDate?: string | undefined,
 };
 
 export const TYPES = {
@@ -103,5 +104,7 @@ export const TYPES = {
   IUserService: Symbol.for('IUserService'),
   ITaskRepository: Symbol.for('ITaskRepository'),
   ITaskService: Symbol.for('ITaskService'),
+  ITaskNoteRepository: Symbol.for('ITaskNoteRepository'),
+  ITaskNoteService: Symbol.for('ITaskNoteService'),
 }
 

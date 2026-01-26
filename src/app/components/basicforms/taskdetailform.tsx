@@ -22,7 +22,9 @@ export default function TaskDetailForm({ task, resetDataToggle, onDataChanged, u
     const [localTask, setLocalTask] = React.useState<Task>(task);
 
     React.useEffect(() => {
-        setLocalTask(new Task());
+        const newTask = new Task();
+        newTask.status = 'Open'; // Set default status to 'Open'
+        setLocalTask(newTask);
     }, [resetDataToggle]);
 
     React.useEffect(() => {
@@ -62,6 +64,11 @@ export default function TaskDetailForm({ task, resetDataToggle, onDataChanged, u
                     setLocalTask(prev => ({ ...prev, assignToUserId: value }));
                     onDataChanged({...localTask, assignToUserId: value});
             }}
+            />
+
+            <InputWithLabel type="date" name="dueDate" label="Due Date" variant="default" size={"full"} labelPosition="top" onBlur={() => onDataChanged(localTask)}
+                value={localTask?.dueDate ? new Date(localTask.dueDate).toISOString().split('T')[0] : ''} 
+                onChange={(e) => setLocalTask(prev => ({ ...prev, dueDate: e.target.value ? new Date(e.target.value) : null }))} 
             />
         </div>
     );
