@@ -1,4 +1,4 @@
-"use server";
+
 
 import TimeTable from "./timetable";
 

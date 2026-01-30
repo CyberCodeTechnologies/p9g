@@ -1,10 +1,76 @@
 'use server';
 
 import { customerValidator, pagerValidator, searchValidator } from '@/core/validators/zodschema';
-import { FormState } from "@/core/types";
+import { FormState, TYPES } from "@/core/types";
 import c from "@/lib/loggers/console/ConsoleLogger";
 import { buildQueryString } from "@/lib/utils";
 import { headers } from 'next/headers';
+import { container } from '@/core/di/dicontainer';
+import ICustomerService from '@/core/services/contracts/ICustomerService';
+import { auth } from '@/app/auth';
+
+import { revalidatePath } from 'next/cache';
+
+export async function customerBulkDelete(ids: string[]): Promise<void> {
+  try {
+    const session = await auth();
+    if (!session?.user) return;
+
+    const customerService = container.get<ICustomerService>(TYPES.ICustomerService);
+    
+    // Execute deletes in parallel
+    await Promise.all(ids.map(id => customerService.customerDelete(id, session.user as any)));
+    
+    revalidatePath('/console/customers');
+  } catch (error) {
+    c.e(error instanceof Error ? error.message : String(error));
+  }
+}
+
+export async function customerExport(formData: FormData): Promise<string | null> {
+  try {
+      const session = await auth();
+      if (!session?.user) return null;
+
+      const formObject = Object.fromEntries(
+          Array.from(formData?.entries()).filter(([key, value]) => value !== 'DEFAULT')
+      );
+
+      const searchFields = searchValidator.safeParse(formObject);
+      if (!searchFields.success) return null;
+
+      const customerService = container.get<ICustomerService>(TYPES.ICustomerService);
+      // Use a large page size to export all matching records
+      const [customers, count] = await customerService.customerFindMany(
+          searchFields.data, 
+          { pageIndex: 1, pageSize: 100000, orderBy: 'name', orderDirection: 'asc' }, 
+          session.user as any
+      );
+
+      // Convert to CSV
+      if (!customers || customers.length === 0) return "";
+
+      const headers = ["ID", "Name", "National ID", "Passport", "Phone", "Email"];
+      const rows = customers.map(c => [
+          c.id, 
+          `"${c.name || ''}"`, 
+          `"${c.nationalId || ''}"`, 
+          `"${c.passport || ''}"`, 
+          `"${c.phone || ''}"`, 
+          `"${c.email || ''}"`
+      ]);
+
+      const csv = [
+          headers.join(","),
+          ...rows.map(r => r.join(","))
+      ].join("\n");
+
+      return csv;
+  } catch (error) {
+      c.e(error instanceof Error ? error.message : String(error));
+      return null;
+  }
+}
 
 export async function customerGetList(formState : FormState, formData: FormData): Promise<FormState> {
   try{

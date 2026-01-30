@@ -1,4 +1,4 @@
-"use server";
+
 import { userGet, userUpdate } from "./actions";
 import UserEdit from "./useredit";
 

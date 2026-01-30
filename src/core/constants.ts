@@ -6,7 +6,9 @@ export const AppUrl = {
 export const ConfigGroup = {
     RESERVATION_STATUS: "RESERVATION_STATUS",
     RESERVATION_TYPE: "RESERVATION_TYPE",
-    RIDE_TYPE: "RIDE_TYPE"
+    RIDE_TYPE: "RIDE_TYPE",
+    DEPARTMENT: "DEPARTMENT",
+    TASK_STATUS: "TASK_STATUS"
 }
 
 export const CurrencyList = ['KWR', 'MMK', 'THB', 'USD'] as const;

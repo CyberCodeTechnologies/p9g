@@ -150,14 +150,19 @@ export class Repository<TDomain extends IDomainModel, TEntity extends IEntity, T
 
     q = q.where(whereQuery).limit(1);
 
-    const [entity] = await q;
+    try {
+      const [entity] = await q;
 
-    if (!entity) return null;
-    c.d(entity);
-    const domain = await this.mapper.mapAsync(entity, this.domainClass) as TDomain;
-    c.d(domain);
-    c.fe('Repository > findOne');
-    return domain;
+      if (!entity) return null;
+      c.d(entity);
+      const domain = await this.mapper.mapAsync(entity, this.domainClass) as TDomain;
+      c.d(domain);
+      c.fe('Repository > findOne');
+      return domain;
+    } catch (err: any) {
+      c.e(`Repository > findOne failed: ${err.message}`);
+      throw err;
+    }
   }
 
 

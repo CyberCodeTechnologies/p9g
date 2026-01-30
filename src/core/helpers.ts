@@ -94,10 +94,23 @@ export function buildAnyCondition(queryObject: any): AnyCondition | null {
 
     return conditions.length > 1 ? and(...conditions) : conditions[0];
 }
-/**
- * Get local date string to display in client browser.
- */
-// export function getLocalDateString(){
+export function formatDateTime(date: Date | string | null | undefined): string {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
+}
+
 //   const now = new Date();//this is local time
 //   // Adjust for timezone offset (critical step!)
 //   const timezoneOffset = now.getTimezoneOffset() * 60000; // Convert minutes to ms

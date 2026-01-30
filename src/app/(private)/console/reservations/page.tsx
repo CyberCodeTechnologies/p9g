@@ -1,4 +1,4 @@
-"use server";
+
 
 import ReservationList from "./reservationlist";
 

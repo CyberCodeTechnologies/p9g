@@ -1,4 +1,4 @@
-"use server";
+
 
 import DailySummaryIncomeReportPage from "./dailysummaryincomereportpage";
 

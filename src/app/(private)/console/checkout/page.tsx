@@ -1,4 +1,4 @@
-"use server";
+
 
 import CheckOutList from "./checkoutlist";
 

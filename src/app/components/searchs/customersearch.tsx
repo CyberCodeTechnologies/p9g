@@ -5,6 +5,8 @@ import { FormState } from "@/core/types";
 import { ButtonCustom } from "../../../lib/components/web/react/uicustom/buttoncustom";
 import CustomerNewForm from "../forms/customernewform";
 import Customer from "@/core/models/domain/Customer";
+import { customerExport } from "@/app/(private)/console/customers/actions";
+import { toast } from "sonner";
 
 
 interface DataTableProps {
@@ -33,6 +35,32 @@ export default function CustomerSearch({
           window.location.reload();
     };
 
+    const handleExport = async () => {
+      if (!formRef?.current) return;
+      
+      try {
+        const formData = new FormData(formRef.current);
+        const csvContent = await customerExport(formData);
+        
+        if (csvContent) {
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            toast.success("Export successful");
+        } else {
+            toast.error("Export failed or no data found");
+        }
+      } catch (e) {
+        toast.error("Export error");
+      }
+    };
+
     return (
         <div>
           <section aria-label="CheckIn Search" className="flex w-full flex-col gap-4">
@@ -44,6 +72,7 @@ export default function CustomerSearch({
                 <InputWithLabel size="sm" label="Phone"  name="searchPhone" defaultValue={searchPhone} onBlur={(e) => setSearchPhone(e.target.value)} />
                 <ButtonCustom variant={"black"} onClick={() => formRef?.current?.requestSubmit()}>Search</ButtonCustom>
                 <ButtonCustom type="button" variant="green" onClick={() => { openCallbackFunc.current?.openDialog(true); }}>New Customer</ButtonCustom>
+                <ButtonCustom type="button" variant="gray" onClick={handleExport}>Export</ButtonCustom>
                 
             </div>
           </section>

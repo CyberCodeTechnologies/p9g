@@ -1,4 +1,4 @@
-"use server";
+
 
 import RoomChangeList from "./roomchangelist";
 

@@ -1,4 +1,4 @@
-import { IDatabaseClient } from '@/lib/db/IDatabase';
+import type { IDatabaseClient } from "@/lib/db/IDatabase";
 import { billTable, configTable, customerTable, logErrorTable, reservationCustomerTable, reservationTable, roomChargeTable, roomReservationTable, roomTable } from '@/core/orms/drizzle/mysql/schema';
 import IRepository from '@/lib/repositories/IRepository';
 import RoomReservation from '@/core/models/domain/RoomReservation';

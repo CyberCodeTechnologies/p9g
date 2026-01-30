@@ -1,4 +1,4 @@
-"use server";
+
 
 import UserNew from "@/app/(private)/console/users/new/usernew";
 import { userNew } from "./actions";

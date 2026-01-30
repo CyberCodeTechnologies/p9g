@@ -41,6 +41,7 @@ interface DataTableProps<TData, TValue> {
   formState: FormState;
   formAction: (formData: FormData) => void;
   formRef: React.RefObject<HTMLFormElement | null>;
+  onRowSelectionChange?: (selectedRows: any) => void;
 }
 
 
@@ -49,6 +50,7 @@ export default function DataTable<TData, TValue>({
   formState,
   formAction,
   formRef,
+  onRowSelectionChange
 }: DataTableProps<TData, TValue>) {
 
   const [data] = React.useState([]);
@@ -59,6 +61,8 @@ export default function DataTable<TData, TValue>({
   // const [orderDirection, setOrderDirection] = React.useState("asc");
   const [records, setRecords] = React.useState(0);
   const [pageIndexList, setPageIndexList] = React.useState(new Map<string, string>([["10", "10"]]));
+  
+  const [rowSelection, setRowSelection] = React.useState({});
 
   //Filter related
   const pageSizeList = new Map<string, string>([
@@ -74,6 +78,12 @@ export default function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const defaultData = React.useMemo(() => [], [])
 
+  React.useEffect(() => {
+      if(onRowSelectionChange){
+        onRowSelectionChange(rowSelection);
+      }
+  }, [rowSelection, onRowSelectionChange]);
+
   const table = useReactTable({
     data: formState.data ?? defaultData,
     columns,
@@ -88,10 +98,12 @@ export default function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
       //pagination,
     },
     autoResetPageIndex: true,

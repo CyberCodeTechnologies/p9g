@@ -10,6 +10,9 @@ import { ButtonCustom } from "../../../lib/components/web/react/uicustom/buttonc
 import Customer from "@/core/models/domain/Customer"
 import CustomerEditForm from "../forms/customereditform";
 import { CopyIcon } from "lucide-react";
+import { customerBulkDelete } from "@/app/(private)/console/customers/actions";
+import { toast } from "sonner";
+import Link from "next/link";
 
 
 interface DataTableProps {
@@ -36,11 +39,53 @@ export default function CustomerTable({
   const addressRefs = React.useRef<Record<string, HTMLInputElement>>({});
   const countryRefs = React.useRef<Record<string, HTMLInputElement>>({});
 
+  const [selectedRowIds, setSelectedRowIds] = React.useState({});
+
+  const handleBulkDelete = async () => {
+    const count = Object.keys(selectedRowIds).length;
+    if (count === 0) return;
+    
+    if(!confirm(`Are you sure you want to delete ${count} customers?`)) return;
+
+    const selectedIndices = Object.keys(selectedRowIds).map(Number);
+    if (!formState.data) return;
+    
+    const idsToDelete = selectedIndices.map(index => formState.data[index]?.id).filter(Boolean);
+    
+    if (idsToDelete.length === 0) return;
+
+    await customerBulkDelete(idsToDelete);
+    setSelectedRowIds({});
+    toast.success("Customers deleted");
+  };
+
   React.useEffect(() => {
     setClientState(formState);
   }, [formState]);
 
   const columns: ColumnDef<Customer>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+          className="translate-y-[2px] w-4 h-4"
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          disabled={!row.getCanSelect()}
+          onChange={row.getToggleSelectedHandler()}
+          className="translate-y-[2px] w-4 h-4"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: "id",
       header: "Id",
@@ -55,7 +100,9 @@ export default function CustomerTable({
       header: "Name",
       cell: ({ row }) => {
         return <div>
-          {row.getValue('name')}
+          <Link href={`/console/customers/${row.original.id}`} className="text-blue-600 hover:underline">
+            {row.getValue('name')}
+          </Link>
         </div>
       }
     },
@@ -156,7 +203,18 @@ export default function CustomerTable({
 
   return (
     <div>
-      <DataTable columns={columns} formState={clientState} formAction={formAction} formRef={formRef} />
+      {Object.keys(selectedRowIds).length > 0 && (
+        <div className="mb-2 flex justify-end">
+          <ButtonCustom variant="red" onClick={handleBulkDelete}>Delete Selected ({Object.keys(selectedRowIds).length})</ButtonCustom>
+        </div>
+      )}
+      <DataTable
+        columns={columns}
+        formState={clientState}
+        formAction={formAction}
+        formRef={formRef}
+        onRowSelectionChange={setSelectedRowIds}
+      />
       <section className="flex">
         <CustomerEditForm openCallback={(func) => openCallbackFunc.current = func} onSaved={handleSave} />
       </section>

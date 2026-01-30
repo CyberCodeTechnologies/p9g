@@ -1,16 +1,23 @@
 'use server';
 
 import { customerValidator } from '@/core/validators/zodschema';
-import { FormState } from "@/core/types";
+import { FormState, TYPES } from "@/core/types";
 import c from "@/lib/loggers/console/ConsoleLogger";
 import Customer from '@/core/models/domain/Customer';
-import { headers } from 'next/headers';
-
+import { auth } from '@/app/auth';
+import { container } from '@/core/di/dicontainer';
+import ICustomerService from '@/core/services/contracts/ICustomerService';
+import { revalidatePath } from 'next/cache';
 
 export async function customerCreate(customer: Customer) : Promise<FormState>{
   try {
     c.fs('Actions > customerCreate');
     c.d(customer);
+
+    const session = await auth();
+    if (!session?.user) {
+        return { error: true, message: 'Unauthorized', data: null, formData: null};
+    }
 
     //validate and parse form input
     const validatedFields = await customerValidator.safeParseAsync(customer);
@@ -22,26 +29,15 @@ export async function customerCreate(customer: Customer) : Promise<FormState>{
       return { error: true, message: 'Invalid inputs.', data: null, formData: null};
     }
 
-    //update user
-    const response = await fetch(process.env.API_URL + `customers`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'cookie': (await headers()).get('cookie')
-      },
-      body: JSON.stringify(validatedFields.data),
-    });
-
-    const responseData = await response.json();
+    const customerService = container.get<ICustomerService>(TYPES.ICustomerService);
     
-    //update user failed
-    if (!response.ok) {
-      c.e(responseData.message);
-      return { error: true, message: `Failed to create customer. ${responseData.message}`};
-    }
+    // Create customer
+    const createdCustomer = await customerService.customerCreate(validatedFields.data as Customer, session.user as any);
+
+    revalidatePath('/console/customers');
 
     c.fe('Actions > customerCreate');
-    return {error: false, message:"Customer create successful", data: responseData.data, formData: null};
+    return {error: false, message:"Customer create successful", data: createdCustomer, formData: null};
   } catch (error) {
     c.e(error instanceof Error ? error.message : String(error));
     return {error: true, message: 'Failed to create customer.', data: null, formData: null};

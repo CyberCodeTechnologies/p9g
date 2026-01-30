@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import { MySql2Database, drizzle} from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 
-import { IDatabaseClient } from '../../../lib/db/IDatabase';
+import type { IDatabaseClient } from '../../../lib/db/IDatabase';
 import * as schema from '@/core/orms/drizzle/mysql/schema';
 
 export type MySqlDbType = MySql2Database<typeof schema>;
@@ -13,6 +13,9 @@ export class MySqlDatabaseClient implements IDatabaseClient<MySqlDbType>{
   private _db: MySqlDbType;
 
   constructor() {
+    if (!process.env.DATABASE_URL) {
+      console.error('ERROR: DATABASE_URL is not defined in environment variables.');
+    }
     const pool = mysql.createPool({
       uri: process.env.DATABASE_URL!,
       waitForConnections: true,
